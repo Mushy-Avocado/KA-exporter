@@ -1,3 +1,68 @@
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement &&    // alternative standard method
+    !document.mozFullScreenElement && !document.webkitFullscreenElement) {  // current working methods
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+  }
+}
+
+window.onbeforeunload = () => true;
+
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    document.querySelector("#toolbar").style.display = "none";
+  } else {
+    document.querySelector("#toolbar").style.display = "block";
+  }
+});
+
+// https://stackoverflow.com/a/61543105/17564818
+let applyScaling = scaledWrapper => {
+  let scaledContents = scaledWrapper.getElementsByClassName('scaled-content');
+
+  for (var i = 0; i < scaledContents.length; i++) {
+    var scaledContent = scaledContents[i];
+    scaledContent.style.transform = 'scale(1, 1)';
+
+    let { width: cw, height: ch } = scaledContent.getBoundingClientRect();
+    let { width: ww, height: wh } = scaledWrapper.getBoundingClientRect();
+
+    let scaleAmtX = Math.min(ww / cw, wh / ch);
+    let scaleAmtY = scaleAmtX;
+    // Don't scale up, only down.
+    if (scaleAmtX > 1 && scaleAmtY > 1) return;
+    scaledContent.style.transform = `scale(${scaleAmtX}, ${scaleAmtY})`;
+    scaledContent.style.webkitTransform = `scale(${scaleAmtX}, ${scaleAmtY})`;
+  }
+};
+
+var wrapper = document.querySelector("#content");
+applyScaling(wrapper);
+// A little hack just to make sure nothing changed after the initial scaling was applied.
+window.setTimeout(() => applyScaling(wrapper), 1000)
+window.onresize = () => applyScaling(wrapper);
+screen.orientation.addEventListener("change", () => applyScaling(wrapper));
+
+// Most browsers support ResizeObserver
+if (typeof ResizeObserver != "undefined") {
+  new ResizeObserver(() => applyScaling(wrapper)).observe(wrapper);
+}
+
+
 /* I added my own getMouseX() and getMouseY() variables to take into account canvas scaling. Projects must use that in order for the mouse position to be accurate. */
 /*
 Repo:
