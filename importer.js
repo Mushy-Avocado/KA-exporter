@@ -224,12 +224,12 @@ function createProcessing(func) {
 
     // These functions are replaced at compile time.
     var replacers = {
-      '/(?<!\\.)mouseX/': 'getMouseX()',
-      '/(?<!\\.)mouseY/': 'getMouseY()',
+      '(?<!\\.)mouseX': 'getMouseX()',
+      '(?<!\\.)mouseY': 'getMouseY()',
     };
   
     for (var [from, to] of Object.entries(replacers)) {
-      codeString = codeString.replaceAll(new RegExp(from), to);
+      codeString = codeString.replaceAll(new RegExp(from, 'g'), to);
     }
     var code = toFunction(codeString);
 
