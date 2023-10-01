@@ -99,6 +99,7 @@
 
     const toolbar = (function() {
 
+			
       let toolbarEnabled = true;
       function toggleToolbar() {
         if (toolbarEnabled) disableToolbar();
@@ -109,10 +110,8 @@
         var elem = document.querySelector('#toolbar');
         if (!elem) return;
         toolbarEnabled = true;
-        elem.style.translate = '0px 0px';
-        elem.style.position = "relative";
-        elem.style.top = "0px";
-        elem.style.left = "0px";
+				let enableEvent = new Event("toolbarshow");
+        window.dispatchEvent(enableEvent);
         updateScaling();
       }
     
@@ -120,11 +119,8 @@
         var elem = document.querySelector('#toolbar');
         if (!elem) return;
         toolbarEnabled = false;
-        elem.style.translate = '0px -100%';
-        elem.style.position = "absolute";
-        elem.style.top = "0px";
-        elem.style.left = "0px";
-        elem.style.right = "0px";
+				let disableEvent = new Event("toolbarhide");
+        window.dispatchEvent(disableEvent);
         updateScaling();
       }
     
@@ -169,12 +165,13 @@
 
     // Save old copies of PJS functions
     const old = {
-      get: processing.get,
-      image: processing.image,
-      background: processing.background,
-      resetMatrix: processing.resetMatrix,
-      filter: processing.filter,
-      loadImage: processing.loadImage,
+      get: processing.get.bind(processing),
+      image: processing.image.bind(processing),
+			loadImage: processing.loadImage.bind(processing),
+      background: processing.background.bind(processing),
+      resetMatrix: processing.resetMatrix.bind(processing),
+      filter: processing.filter.bind(processing),
+      loadImage: processing.loadImage.bind(processing),
     };
 
     // Resizes the canvas to render correctly at the specified width and height.
@@ -219,7 +216,7 @@
         source = processing.assetRoot + 'images/' + source;
       if (!hasFileExtension(source))
         source += '.png';
-      return old.image(source);
+      return old.loadImage(source);
     }
     processing.getImage = processing.loadImage;
 
@@ -246,18 +243,18 @@
 
     // New functions that take into account scaling
     processing.image = function(img, x, y, w, h) {
-      if (!w && !h)
-        old.image.call(this, img, x, y, img.width / (img.originScaleX || 1), img.height / (img.originScaleY || 1));
-      else old.image.call(this, img, x, y, w, h);
+			if (!w && !h)
+        old.image(img, x, y, img.width / (img.originScaleX || 1), img.height / (img.originScaleY || 1));
+      else old.image(img, x, y, w, h);
     };
     processing.get = function() {
       var ret;
       if (arguments.length == 0)
-        ret = old.get.call(this, 0, 0, window.canvas.width, window.canvas.height);
+        ret = old.get(0, 0, window.canvas.width, window.canvas.height);
       else if (arguments.length == 2)
-        ret = old.get.call(this, arguments[0] * canvasScaleX, arguments[1] * canvasScaleY);
+        ret = old.get(arguments[0] * canvasScaleX, arguments[1] * canvasScaleY);
       else
-        ret = old.get.call(this, arguments[0] * canvasScaleX, arguments[1] * canvasScaleY, arguments[2] * canvasScaleX, arguments[3] * canvasScaleY);
+        ret = old.get(arguments[0] * canvasScaleX, arguments[1] * canvasScaleY, arguments[2] * canvasScaleX, arguments[3] * canvasScaleY);
       // If the canvas is resized multiple times, this makes sure it's rendered correctly (albeit blurry)
       ret.originScaleX = canvasScaleX;
       ret.originScaleY = canvasScaleY;
@@ -354,7 +351,7 @@
     var code = toFunction(codeString);
 
     // Make processing variables the global context.
-    return wrap('with (processing) {', code, '}', ['processing']);
+    return wrap('with (processing) { try {', code, '} catch(e) { console.error(e); } }', ['processing']);
   }
 
   // Add fullscreen button
@@ -380,7 +377,7 @@
   // The final output to give to processing.js
   function output(processing) {
     initialize(processing);
-    compiledProgram(processing);
+		compiledProgram(processing);
     layout.update();
   }
   
