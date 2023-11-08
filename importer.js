@@ -110,12 +110,13 @@
 
 			
       let toolbarEnabled = true;
+			
       function toggleToolbar() {
         if (toolbarEnabled) disableToolbar();
         else enableToolbar();
       }
     
-      function enableToolbar() {
+      function expandToolbar() {
         var elem = document.querySelector('#toolbar');
         if (!elem) return;
         toolbarEnabled = true;
@@ -124,7 +125,7 @@
         updateScaling();
       }
     
-      function disableToolbar() {
+      function collapseToolbar() {
         var elem = document.querySelector('#toolbar');
         if (!elem) return;
         toolbarEnabled = false;
@@ -132,16 +133,23 @@
         window.dispatchEvent(disableEvent);
         updateScaling();
       }
+
+			function disableToolbar() {
+				var elem = document.querySelector('#toolbar');
+				if (!elem) return;
+				elem.remove();
+				updateScaling();
+			}
     
       // Updates the toolbar layout
       function updateToolbar() {
-        if (window.innerHeight == screen.height) disableToolbar();
-        else enableToolbar();
+        if (window.innerHeight == screen.height) collapseToolbar();
+        else expandToolbar();
       }
   
       return {
         toggle: toggleToolbar,
-        enable: enableToolbar,
+				enable: () => {},
         disable: disableToolbar,
         update: updateToolbar,
       }
@@ -363,9 +371,8 @@
 
 		// Sets/toggles the toolbar visibility
     processing.toolbar = function(bool) {
-      if (bool == true) layout.toolbar.enable();
+      if (bool == true || bool == void 0) layout.toolbar.enable();
       else if (bool == false) layout.toolbar.disable();
-      else layout.toolbar.toggle();
     };
 
 		// Disabled scaling the canvas to be fullscreen
@@ -385,6 +392,16 @@
     var loopTimeoutMatch = codeString.match("this[ ]*\[[ ]*\[[ ]*(\"KAInfiniteLoopSetTimeout\")[ ]*\][ ]*\][ ]*\([ ]*\d*[ ]*\);*");
     if (loopTimeoutMatch)
       codeString = codeString.replace(loopTimeoutMatch[0], "");
+
+    // These functions are replaced at compile time.
+    var replacers = {
+      '(?<!\\.)mouseX': 'getMouseX()',
+      '(?<!\\.)mouseY': 'getMouseY()',
+    };
+
+    for (var [from, to] of Object.entries(replacers)) {
+      //codeString = codeString.replaceAll(new RegExp(from, 'g'), to);
+    }
     
     var code = toFunction(codeString);
 
