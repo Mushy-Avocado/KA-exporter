@@ -260,7 +260,9 @@
     // Override loadImage and getImage.
     // Image files should be stored in assetRoot/images/filePath
     processing.loadImage = function(source) {
-      if (!source.startsWith(processing.assetRoot + 'images') && !source.includes("kasandbox.org")
+			if (window.location.href.includes("kasandbox.org"))
+	    	source = "https://cdn.kastatic.org/third_party/javascript-khansrc/live-editor/build/images/" + source + ".png";
+      else if (!source.startsWith(processing.assetRoot + 'images')
         source = processing.assetRoot + 'images/' + source;
       if (!hasFileExtension(source))
         source += '.png';
