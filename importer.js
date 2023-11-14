@@ -260,7 +260,7 @@
     // Override loadImage and getImage.
     // Image files should be stored in assetRoot/images/filePath
     processing.loadImage = function(source) {
-      if (!source.startsWith(processing.assetRoot + 'images'))
+      if (!source.startsWith(processing.assetRoot + 'images') && !source.includes("kasandbox.org")
         source = processing.assetRoot + 'images/' + source;
       if (!hasFileExtension(source))
         source += '.png';
@@ -272,7 +272,7 @@
     // Sound files should be stored in assetRoot/sounds/filePath
     var loadedSounds = {};
     processing.getSound = function(source) {
-      if (!source.startsWith(processing.assetRoot + 'sounds'))
+      if (!source.startsWith(processing.assetRoot + 'sounds') && !source.includes("kasandbox.org")
         source = processing.assetRoot + 'sounds/' + source;
       if (!hasFileExtension(source))
         source += '.mp3';
