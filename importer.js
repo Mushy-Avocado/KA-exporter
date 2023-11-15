@@ -279,7 +279,7 @@
     var loadedSounds = {};
     processing.getSound = function(source) {
       if (window.location.href.includes("kasandbox.org"))
-	    	source = "https://cdn.kastatic.org/third_party/javascript-khansrc/live-editor/build/sounds/" + source + ".png";
+	    	source = "https://cdn.kastatic.org/third_party/javascript-khansrc/live-editor/build/sounds/" + source;
       else if (!source.startsWith(processing.assetRoot + 'sounds'))
         source = processing.assetRoot + 'sounds/' + source;
       if (!hasFileExtension(source))
