@@ -178,6 +178,7 @@
     processing.size(400, 400);
     processing.background(255, 255, 255);
     processing.angleMode = "degrees";
+	  processing.strokeCap(processing.ROUND);
     processing.assetRoot = '/'; // Where sounds and images are stored
 
 		var doResize = true;
