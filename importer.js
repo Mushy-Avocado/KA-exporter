@@ -269,6 +269,7 @@
         source += '.png';
       if (!cachedImages[source]) {
         cachedImages[source] = old.loadImage(source);
+      	cachedImages[source].sourceImg.crossOrigin = "anonymous";
       }
       return cachedImages[source];
     }
@@ -400,16 +401,6 @@
     var loopTimeoutMatch = codeString.match("this[ ]*\[[ ]*\[[ ]*(\"KAInfiniteLoopSetTimeout\")[ ]*\][ ]*\][ ]*\([ ]*\d*[ ]*\);*");
     if (loopTimeoutMatch)
       codeString = codeString.replace(loopTimeoutMatch[0], "");
-
-    // These functions are replaced at compile time.
-    var replacers = {
-      '(?<!\\.)mouseX': 'getMouseX()',
-      '(?<!\\.)mouseY': 'getMouseY()',
-    };
-
-    for (var [from, to] of Object.entries(replacers)) {
-      //codeString = codeString.replaceAll(new RegExp(from, 'g'), to);
-    }
     
     var code = toFunction(codeString);
 
