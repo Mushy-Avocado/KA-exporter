@@ -1,12 +1,6 @@
 (function() {
 
-	// Oops! Looks like there's nothing to load...
-	if (typeof program == 'undefined') {
-		console.error('Failed to load sketch: Missing a global function called "program" to load. Make sure you loaded the script containing it before loading the exporter.');
-		return;
-	}
-
-	// Firefox has poor performance
+	// Warn about Firefox - it has poor performance
 	(function() {
 		let warnedFirefox = !navigator.userAgent.toLowerCase().includes('firefox') || localStorage.getItem('warnedFirefox');
 		if (!warnedFirefox) {
@@ -15,24 +9,17 @@
 		}
 	})();
 
-	// Takes a function and adds the specified strings of code before and after it.
-	function wrap(start, code, end, args) {
-		if (!args) args = [];
-		if (typeof args == "string") args = [args];
-		code = code.toString();
-		var codeString = (start + code.substring(code.indexOf("{") + 1, code.lastIndexOf("}")) + end);
-		return new Function('return function foo(' + args.join(',') + ') {' + codeString + '}')();
+	function getFunctionBody(func) {
+		if (typeof func === "function") {
+			func = func.toString();
+		}
+		return func.substring(func.indexOf("{") + 1, func.lastIndexOf("}"));
 	}
 
 	// Whether a url has a file extension or not.
 	function hasFileExtension(source) {
 		var a = source.split('/');
 		return a[a.length - 1].includes('.');
-	}
-
-	// Converts a string to a function
-	function toFunction(codeString) {
-		return new Function("return " + codeString)();
 	}
 
 	const fullscreen = (function() {
@@ -83,44 +70,53 @@
 		};
 
 	})();
-	const layout = (function() {
-
-		// Updates the scale of the canvas to fit its parent element
-		function updateScaling() {
-			var canvas = window.canvas;
-			var parent = canvas.parentElement;
-
-			let parentRect = parent.getBoundingClientRect();
-			var parentWidth = parentRect.right - parentRect.left;
-			var parentHeight = parentRect.bottom - parentRect.top;
-			var scaleX = parentWidth / canvas.width;
-			var scaleY = parentHeight / canvas.height;
-
-			if (Math.min(scaleX, scaleY) > 1) {
-				canvas.style.scale = 1;
-				return;
-			}
-			canvas.style.scale = Math.min(scaleX, scaleY);
-		};
-
-		return {
-			update: function() {
-				updateScaling();
-			},
-		}
-
-	})();
 
 	// Initializes the program to make it load
-	function initialize(processing) {
-        
+	window.importerKA = function(processing, canvas) {
+
+		const layout = (function(canvas) {
+
+			// Updates the scale of the canvas to fit its parent element
+			function updateScaling() {
+				var parent = canvas.parentElement;
+
+				let parentRect = parent.getBoundingClientRect();
+				var parentWidth = parentRect.right - parentRect.left;
+				var parentHeight = parentRect.bottom - parentRect.top;
+				var scaleX = parentWidth / canvas.width;
+				var scaleY = parentHeight / canvas.height;
+
+				if (Math.min(scaleX, scaleY) > 1) {
+					canvas.style.scale = 1;
+					return;
+				}
+				canvas.style.scale = Math.min(scaleX, scaleY);
+			};
+
+			return {
+				update: function() {
+					updateScaling();
+				},
+			}
+
+		})(canvas);
+
+		// Subsribe to various events to update the layout.
+		screen.orientation.addEventListener("change", layout.update);
+		window.addEventListener("resize", layout.update);
+		window.addEventListener("load", layout.update);
+
+		// To fix an issue where Processing.js throws an error on mobile and breaks the layout
+		window.addEventListener("touchstart", () => layout.update(), { once: true, });
+		
 		// Apply defaults
 		processing.size(400, 400);
 		processing.background(255, 255, 255);
 		processing.angleMode = "degrees";
 		processing.strokeCap(processing.ROUND);
 		processing.assetRoot = '/'; // Where sounds and images are stored
-
+		processing.draw = function() {};
+		
 		var doResize = true;
 		var canvasScaleX = 1;
 		var canvasScaleY = 1;
@@ -153,15 +149,15 @@
 
 		// Resizes the canvas to render at a higher resolution.
 		const resize = function(width, height) {
-            let scaleIncrement = Math.min(processing.width, processing.height) / 2;
+			let scaleIncrement = Math.min(processing.width, processing.height) / 2;
 			if (!doResize) return;
 			width = snapToIncrement(width, scaleIncrement);
 			height = snapToIncrement(height, scaleIncrement);
 			// Match to the aspect ratio of the canvas
 			width = height * (processing.width / processing.height);
 			height = height;
-			window.canvas.width = width;
-			window.canvas.height = height;
+			canvas.width = width;
+			canvas.height = height;
 			canvasScaleX = width / processing.width;
 			canvasScaleY = height / processing.height;
 			old.resetMatrix();
@@ -237,7 +233,7 @@
 		processing.get = function() {
 			var ret;
 			if (arguments.length == 0)
-				ret = old.get(0, 0, window.canvas.width, window.canvas.height);
+				ret = old.get(0, 0, canvas.width, canvas.height);
 			else if (arguments.length == 2)
 				ret = old.get(arguments[0] * canvasScaleX, arguments[1] * canvasScaleY);
 			else
@@ -281,12 +277,12 @@
 		// Scales an axis based on the size of the canvas
 		// Takes a screen position as input
 		processing.canvasX = function(x) {
-			var clientRect = window.canvas.getBoundingClientRect();
+			var clientRect = canvas.getBoundingClientRect();
 			var scaleX = clientRect.width / (processing.width * canvasScaleX);
 			return (x - clientRect.left) / (scaleX * canvasScaleX);
 		};
 		processing.canvasY = function(y) {
-			var clientRect = window.canvas.getBoundingClientRect();
+			var clientRect = canvas.getBoundingClientRect();
 			var scaleY = clientRect.height / (processing.height * canvasScaleY);
 			return (y - clientRect.top) / (scaleY * canvasScaleY);
 		};
@@ -304,47 +300,55 @@
 			doResize = false;
 		};
 
-        window.LoopProtector = { prototype: {} };
-        processing.KAInfiniteLoopSetTimeout = () => {};
-        processing.externals = {
-            canvas: window.canvas,
-        };
+		window.LoopProtector = function() {};
+		processing.KAInfiniteLoopSetTimeout = () => {};
+		processing.externals = {
+			canvas: canvas,
+		};
 
 		layout.update();
 	}
 
-	// Takes in a function and outputs a compiled version at runtime.
-	function compile(func) {
-		// Make processing variables the global context.
-		return wrap('with (processing) { try {', func, '} catch(e) { console.error(e); } }', ['processing']);
-	}
-
-	// Subsribe to various events to update the layout.
-	screen.orientation.addEventListener("change", layout.update);
-	window.addEventListener("resize", layout.update);
-	window.addEventListener("load", layout.update);
-
-	// To fix an issue where Processing.js throws an error on mobile and breaks the layout
-	window.addEventListener("touchstart", () => {
-        layout.update();
-	}, {
-		once: true,
+	const importerReady = new Promise((resolve, reject) => {
+		// Make sure the correct Processing.js library is loaded
+		const pjsURL = 'https://cdn.jsdelivr.net/gh/Khan/processing-js@master/processing.js';
+		if (!document.querySelector(`script[src='${pjsURL}']`)) {
+			let script = document.createElement("script");
+			script.src = pjsURL;
+			script.type = "text/javascript";
+			script.onload = () => {
+				console.log("KA Exporter: KA Processing.js library loaded from " + pjsURL);
+				resolve();
+			};
+			document.head.appendChild(script);
+		} else return void resolve();
 	});
 
-	// Compile the input function
-	var compiledProgram = compile(program);
+	let pjsInstanceCount = 0;
+	window.importPJS = async function(program) {
+		
+		await importerReady;
 
-	// The final output to give to processing.js
-	function output(processing) {
-		initialize(processing);
-		compiledProgram.call(processing, processing);
-		layout.update();
+		const index = pjsInstanceCount++;
+		const script = document.createElement("script");
+		script.innerHTML = `
+const __pjsIndex = ${index};
+let canvas = document.getElementsByClassName("sketch")[__pjsIndex];
+if (!canvas) {
+	throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML with an class name of 'sketch'. If you load multiple PJS scripts make sure you have a matching number of canvas tags.";
+}
+let __processing = processing = new Processing(canvas, proc => {
+	window.importerKA(proc, canvas);
+});
+with(__processing) {
+	${getFunctionBody(program)}
+ 	if (typeof draw !== "undefined") {
+		__processing.draw = draw.bind(this);
 	}
-
-	window.canvas = document.getElementById("sketch") || document.getElementsByTagName("canvas")[0];
-    if (!window.canvas) {
-        console.error("Failed to load sketch: Missing a canvas element in the HTML. If you have multiple canvases, you can use a specific one by giving it an ID of 'sketch'.");
-        return;
-    }
-	window.processing = new Processing(window.canvas, output);
+}
+		`;
+		script.type = "text/javascript";
+		document.body.appendChild(script);
+	};
+	
 })();
