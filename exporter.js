@@ -332,12 +332,12 @@
 		const index = pjsInstanceCount++;
 		const script = document.createElement("script");
 		script.innerHTML = `
-const __pjsIndex = ${index};
-let canvas = document.getElementsByClassName("sketch")[__pjsIndex];
+var __pjsIndex = ${index};
+var canvas = document.getElementsByClassName("sketch")[__pjsIndex];
 if (!canvas) {
 	throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML with an class name of 'sketch'. If you load multiple PJS scripts make sure you have a matching number of canvas tags.";
 }
-let __processing = processing = new Processing(canvas, proc => {
+var __processing = processing = new Processing(canvas, proc => {
 	window.importerKA(proc, canvas);
 });
 with(__processing) {
