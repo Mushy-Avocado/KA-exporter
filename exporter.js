@@ -35,34 +35,31 @@
             return Promise.all([
                 // Load cached image URLs
                 new Promise((resolve, reject) => {
-                    let index = 0;
-                    if (imageURLs.length === 0) return void resolve();
-                    imageURLs.forEach(url => {
-                        cache[url] = new Image();
-                        cache[url].onload = () => {
+                    let index = 0,
+                        next = () => {
                             currentProgress++;
                             if (++index >= imageURLs.length) resolve();
                         };
-                        cache[url].onerror = () => {
-                            reject("Failed to load image '" + url + "'. Make sure it exists or is in the correct folder.");
-                            return false;
-                        };
+                    if (imageURLs.length === 0) return void resolve();
+                    imageURLs.forEach(url => {
+                        cache[url] = new Image();
+                        cache[url].onload = next;
+                        cache[url].onerror = next
                         cache[url].src = url;
                     });
                 }).catch(console.error),
                 // Load cached sound URLs
                 new Promise((resolve, reject) => {
-                    let index = 0;
-                    if (soundURLs.length === 0) return void resolve();
-                    soundURLs.forEach(url => {
-                        cache[url] = new Audio(url);
-                        cache[url].oncanplaythrough = () => {
+                    let index = 0,
+                        next = () => {
                             currentProgress++;
                             if (++index >= soundURLs.length) resolve();
                         };
-                        cache[url].onerror = () => {
-                            reject("Failed to load sound '" + url + "'. Make sure it exits or is in the correct folder.");
-                        };
+                    if (soundURLs.length === 0) return void resolve();
+                    soundURLs.forEach(url => {
+                        cache[url] = new Audio(url);
+                        cache[url].oncanplaythrough = next;
+                        cache[url].onerror = next;
                     });
                 }).catch(console.error),
             ]);
@@ -487,13 +484,15 @@ throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML 
 var __processing = processing = new Processing(canvas, proc => {
 window.importerKA(proc, canvas);
 });
-var __processingCopy = {};
 Object.keys(processing).forEach(key => {
 	if (!window[key]) {
- 		__processingCopy[key] = processing[key];
+ 		try {
+			window[key] = processing[key];
+		} catch(e) {
+		
+		}
 	}
 });
-Object.assign(window, __processingCopy);
 with (__processing) {
 	${getFunctionBody(program)}
 	if (typeof draw !== "undefined") {
@@ -506,4 +505,4 @@ with (__processing) {
         document.body.appendChild(script);
     };
 
-})(); 
+})();
