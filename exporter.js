@@ -43,6 +43,7 @@
                     if (imageURLs.length === 0) return void resolve();
                     imageURLs.forEach(url => {
                         cache[url] = new Image();
+		    	cache[url].crossOrigin = "anonymous";
                         cache[url].onload = next;
                         cache[url].onerror = next
                         cache[url].src = url;
@@ -58,6 +59,7 @@
                     if (soundURLs.length === 0) return void resolve();
                     soundURLs.forEach(url => {
                         cache[url] = new Audio(url);
+		    	cache[url].crossOrigin = "anonymous";
                         cache[url].oncanplaythrough = next;
                         cache[url].onerror = next;
                     });
