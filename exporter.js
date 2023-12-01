@@ -383,6 +383,10 @@
             doResize = false;
         };
 
+    	processing.noCursor = function() {
+     		processing.cursor("none");
+	};
+
         window.LoopProtector = function() {};
         processing.KAInfiniteLoopSetTimeout = () => {};
         processing.externals = {
