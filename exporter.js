@@ -483,7 +483,13 @@ throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML 
 var __processing = processing = new Processing(canvas, proc => {
 window.importerKA(proc, canvas);
 });
-Object.assign(window, processing);
+var __processingCopy = {};
+Object.keys(processing).forEach(key => {
+	if (!window.hasOwnProperty(key)) {
+ 		_processingCopy[key] = processing[key];
+	}
+});
+Object.assign(window, __processingKey);
 with (__processing) {
 	${getFunctionBody(program)}
 	if (typeof draw !== "undefined") {
