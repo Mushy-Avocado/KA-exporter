@@ -489,7 +489,7 @@ window.importerKA(proc, canvas);
 });
 var __processingCopy = {};
 Object.keys(processing).forEach(key => {
-	if (!window.hasOwnProperty(key)) {
+	if (!window[key]) {
  		__processingCopy[key] = processing[key];
 	}
 });
