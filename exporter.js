@@ -426,34 +426,6 @@
         })();
 
         const index = pjsInstanceCount++;
-        /*
-        const canvas = document.getElementsByClassName("sketch")[index];
-        const loadingBar = document.createElement("div");
-        loadingBar.style.backgroundColor = "rgb(200, 200, 200)";
-        loadingBar.style.position = "absolute";
-        loadingBar.style.zIndex = 1000;
-        loadingBar.style.top = "0px";
-        loadingBar.style.left = "0px";
-        loadingBar.style.width = "0%";
-        loadingBar.style.height = "100%";
-        canvas.parentElement.style.position = "relative";
-
-        const loadingParent = document.createElement("div");
-        loadingParent.style.position = "absolute";
-        loadingParent.style.zIndex = 100;
-        loadingParent.style.top = "50%";
-        loadingParent.style.left = "50%";
-        loadingParent.style.transform = "translate(-50%, -50%)"
-        loadingParent.style.width = "200px";
-        loadingParent.style.height = "50px";
-        loadingParent.style.backgroundColor = "rgb(50, 50, 50)";
-
-        loadingParent.appendChild(loadingBar);
-        canvas.parentElement.appendChild(loadingParent);
-        const loadingInterval = setInterval(() => {
-        	loadingBar.style.width = (assets.progress * 100) + "%";
-        }, 1000/60);
-        */
 
         // Make sure the correct Processing.js library is loaded
         const pjsLoaded = new Promise((resolve, reject) => {
@@ -475,20 +447,15 @@
             assets.load(),
         ]);
 
-        /*
-        loadingParent.remove();
-        clearInterval(loadingInterval);
-        */
-
         const script = document.createElement("script");
         script.innerHTML = `
 var __pjsIndex = ${index};
 var canvas = document.getElementsByClassName("sketch")[__pjsIndex];
 if (!canvas) {
-throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML with an class name of 'sketch'. If you load multiple PJS scripts make sure you have a matching number of canvas tags.";
+	throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML with an class name of 'sketch'. If you load multiple PJS scripts make sure you have a matching number of canvas tags.";
 }
 var __processing = processing = new Processing(canvas, proc => {
-window.importerKA(proc, canvas);
+	window.importerKA(proc, canvas);
 });
 Object.keys(processing).forEach(key => {
 	if (!window[key]) {
@@ -499,13 +466,15 @@ Object.keys(processing).forEach(key => {
 		}
 	}
 });
-with (__processing) {
-	${getFunctionBody(program)}
-	if (typeof draw !== "undefined") {
-		__processing.draw = draw.bind(this);
+(function() {
+	with (__processing) {
+		${getFunctionBody(program)}
+		if (typeof draw !== "undefined") {
+			__processing.draw = draw.bind(this);
+		}
+		console.log("---Processing sketch sucessfully loaded---");
 	}
-	console.log("---Processing sketch sucessfully loaded---");
-}
+})();
 		`;
         script.type = "text/javascript";
         document.body.appendChild(script);
