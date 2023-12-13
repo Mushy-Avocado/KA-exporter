@@ -485,9 +485,9 @@ Object.keys(processing).forEach(key => {
     window.parent.html2canvas = function() {
         let thumbnailCanvas = document.createElement("canvas");
         let context = thumbnailCanvas.getContext("2d");
-        thumbnailCanvas.width = "600";
-        thumbnailCanvas.height = "600";
-        context.drawImage(window.__globalCanvas, 0, 0, window.__globalCanvas.width, window.__globalCanvas.height, 0, 0, 600, 600);
+        thumbnailCanvas.width = "200";
+        thumbnailCanvas.height = "200";
+        context.drawImage(window.__globalCanvas, 0, 0, window.__globalCanvas.width, window.__globalCanvas.height, 0, 0, 200, 200);
         console.log("Saving canvas data from ", window.__globalCanvas);
         window.top.postMessage(thumbnailCanvas.toDataURL(), "*");
     };
