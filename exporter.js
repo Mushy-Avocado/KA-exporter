@@ -452,7 +452,7 @@
         const script = document.createElement("script");
         script.innerHTML = `
 var __pjsIndex = ${index};
-var canvas = document.getElementsByClassName("sketch")[__pjsIndex];
+var canvas = window.__globalCanvas = document.getElementsByClassName("sketch")[__pjsIndex];
 if (!canvas) {
 	throw "KA Exporter: Failed to load sketch: Missing a canvas element in the HTML with an class name of 'sketch'. If you load multiple PJS scripts make sure you have a matching number of canvas tags.";
 }
@@ -480,6 +480,11 @@ Object.keys(processing).forEach(key => {
 		`;
         script.type = "text/javascript";
         document.body.appendChild(script);
+    };
+
+    window.parent.html2canvas = function() {
+        console.log("Saving canvas data from ", window.__globalCanvas);
+        window.top.postMessage(window.__globalCanvas.toDataURL(), "*");
     };
 
 })();
