@@ -43,7 +43,7 @@
                     if (imageURLs.length === 0) return void resolve();
                     imageURLs.forEach(url => {
                         cache[url] = new Image();
-		    	cache[url].crossOrigin = "anonymous";
+                        cache[url].crossOrigin = "anonymous";
                         cache[url].onload = next;
                         cache[url].onerror = next
                         cache[url].src = url;
@@ -59,7 +59,7 @@
                     if (soundURLs.length === 0) return void resolve();
                     soundURLs.forEach(url => {
                         cache[url] = new Audio(url);
-		    	cache[url].crossOrigin = "anonymous";
+                        cache[url].crossOrigin = "anonymous";
                         cache[url].oncanplaythrough = next;
                         cache[url].onerror = next;
                     });
@@ -257,8 +257,10 @@
         processing.size = function(w, h) {
             processing.width = w;
             processing.height = h;
-            var targetW = screen.width * window.devicePixelRatio;
-            var targetH = screen.height * window.devicePixelRatio;
+            var w = window.parent !== window.top ? document.body.clientWidth : screen.width;
+            var h = window.parent !== window.top ? document.body.clientHeight : screen.height;
+            var targetW = w * window.devicePixelRatio;
+            var targetH = h * window.devicePixelRatio;
             resize(targetW, targetH);
             layout.update();
         };
@@ -383,9 +385,9 @@
             doResize = false;
         };
 
-    	processing.noCursor = function() {
-     		processing.cursor("none");
-	};
+        processing.noCursor = function() {
+            processing.cursor("none");
+        };
 
         window.LoopProtector = function() {};
         processing.KAInfiniteLoopSetTimeout = () => {};
