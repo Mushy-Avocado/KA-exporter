@@ -302,6 +302,7 @@
         }
         processing.playSound = function(sound, volume = 1) {
             sound.volume = volume;
+            sound.currentTime = 0;
             sound.play().catch(e => {
                 console.warn(e);
             });
@@ -393,6 +394,7 @@
         processing.KAInfiniteLoopSetTimeout = () => {};
         processing.externals = {
             canvas: canvas,
+            context: canvas.getContext("2d"),
         };
 
         layout.update();
@@ -476,7 +478,7 @@ Object.keys(processing).forEach(key => {
 		}
 		console.log("---Processing sketch sucessfully loaded---");
 	}
-})();
+}).call(__processing);
 		`;
         script.type = "text/javascript";
         document.body.appendChild(script);
