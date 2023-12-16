@@ -1,4 +1,8 @@
 (function() {
+
+	var loadID = Date.now();
+	window.currentLoad = loadID;
+	
     // Warn about Firefox - it has poor performance
     (function() {
         let warnedFirefox = !navigator.userAgent.toLowerCase().includes('firefox') || localStorage.getItem('warnedFirefox');
@@ -855,6 +859,11 @@
             pjsLoaded,
             assets.load(),
         ]);
+
+		if (window.currentLoad !== loadID) {
+            return;
+        }
+		
         const script = document.createElement("script");
         script.innerHTML = `
 var __pjsIndex = ${index};
