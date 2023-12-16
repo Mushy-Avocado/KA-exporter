@@ -3,8 +3,11 @@ Export existing Khan Academy projects easily by loading this script.
 
 ### Documentation
 
+Load the script. That's all there is to it! You need to have a canvas with an ID of "sketch" on the target canvas you want to load.
+
+Example program:
 ```
-// Global function must be named "program"
+// Contain all KA code within a function
 function program() {
   size(400, 400); // Define canvas size
   title("Project name here");
@@ -14,6 +17,6 @@ function program() {
   ellipse(50, 50, 100, 100);
 }
 
-```
+runPJS(program); // Run the code
 
-Then load the script. That's all there is to it! You need to have an ID of "canvas" on the target canvas you want to load.
+```
