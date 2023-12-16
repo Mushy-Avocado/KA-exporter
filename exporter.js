@@ -231,6 +231,7 @@
             var targetH = h * window.devicePixelRatio;
             resize(targetW, targetH);
             layout.update();
+	        processing.background(255);
         };
         // Sets the title for the project
         processing.title = function(value) {
