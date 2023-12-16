@@ -177,9 +177,7 @@
         });
         // Apply defaults
         processing.size(400, 400);
-        processing.background(255, 255, 255);
         processing.angleMode = "degrees";
-        processing.strokeCap(processing.ROUND);
         processing.draw = function() {}; // draw() needs a value for PJS to run it
         var doResize = true;
         var canvasScaleX = 1;
@@ -860,7 +858,7 @@
             assets.load(),
         ]);
 
-		if (window.currentLoad !== loadID) {
+	    if (window.currentLoad !== loadID) {
             return;
         }
 		
@@ -874,6 +872,8 @@ if (!canvas) {
 var __processing = processing = new Processing(canvas, proc => {
 	window.importerKA(proc, canvas);
 });
+processing.strokeCap(processing.ROUND);
+processing.background(255, 255, 255);
 Object.keys(processing).forEach(key => {
 	if (!window[key]) {
  		try {
