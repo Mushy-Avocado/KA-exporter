@@ -899,9 +899,10 @@
 				});
 				${getFunctionBody(program)}
 				if (typeof draw !== "undefined") {
+				    var old = draw;
     					__processing.draw = function() {
 						window.__frameRate = processing.__frameRate;
-      						draw.call(__processing);
+      						old.call(__processing);
       					};
 				}
 				console.log("---Processing sketch sucessfully loaded---");
