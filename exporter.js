@@ -899,7 +899,10 @@
 				});
 				${getFunctionBody(program)}
 				if (typeof draw !== "undefined") {
-					__processing.draw = draw.bind(this);
+    					__processing.draw = function() {
+						window.__frameRate = processing.__frameRate;
+      						draw.call(__processing);
+      					};
 				}
 				console.log("---Processing sketch sucessfully loaded---");
 			}
