@@ -233,8 +233,8 @@
 			processing.height = h;
 			var w = window.parent !== window.top ? document.body.clientWidth : screen.width;
 			var h = window.parent !== window.top ? document.body.clientHeight : screen.height;
-			var targetW = w / window.devicePixelRatio;
-			var targetH = h / window.devicePixelRatio;
+			var targetW = w;
+			var targetH = h;
 			resize(targetW, targetH);
 			layout.update();
 			processing.background(255);
