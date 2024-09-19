@@ -351,6 +351,7 @@
 		processing.noCursor = function() {
 			processing.cursor("none");
 		};
+		processing.updateLayout = () => layout.update();
 		window.LoopProtector = function() {};
 		processing.KAInfiniteLoopSetTimeout = () => {};
 		processing.externals = {
@@ -902,6 +903,7 @@
 				    var old = draw;
     					__processing.draw = function() {
 						window.__frameRate = processing.__frameRate;
+      						__processing.updateLayout();
       						old.call(__processing);
       					};
 				}
