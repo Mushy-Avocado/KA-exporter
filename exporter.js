@@ -212,7 +212,7 @@
 		}
 		// Resizes the canvas to render at a higher resolution.
 		const resize = function(width, height) {
-			let scaleIncrement = Math.min(processing.width, processing.height) / 2;
+			let scaleIncrement = Math.min(processing.width, processing.height);
 			if (!doResize) return;
 			width = snapToIncrement(width, scaleIncrement);
 			height = snapToIncrement(height, scaleIncrement);
