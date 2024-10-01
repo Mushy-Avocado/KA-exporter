@@ -3,7 +3,7 @@ Export existing Khan Academy projects easily by loading this script.
 
 ### Documentation
 
-Load the script. You need to have a canvas with a class of "sketch" on the target canvas you want to load.
+You need to have a canvas with a class of "sketch" on the target canvas you want to load.
 
 Example program:
 ```
@@ -20,3 +20,7 @@ function program() {
 runPJS(program); // Run the code
 
 ```
+
+For every call to `runPJS()`, there must be a matching number of canvas tags.
+
+Find the tool to export existing programs [here](https://www.khanacademy.org/computer-programming/ka-project-exporter/5195486791385088)
