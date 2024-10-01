@@ -942,10 +942,14 @@ SOFTWARE.
 	window.parent.html2canvas = function() {
 		let thumbnailCanvas = document.createElement("canvas");
 		let context = thumbnailCanvas.getContext("2d");
-		thumbnailCanvas.width = "200";
-		thumbnailCanvas.height = "200";
-		context.drawImage(window.__globalCanvas, 0, 0, window.__globalCanvas.width, window.__globalCanvas.height, 0, 0, 200, 200);
-		console.log("Saving canvas data from ", window.__globalCanvas);
+		thumbnailCanvas.width = "600";
+		thumbnailCanvas.height = "600";
+		if (window.__globalCanvas) {
+	    		context.drawImage(window.__globalCanvas, 0, 0, window.__globalCanvas.width, window.__globalCanvas.height, 0, 0, 600, 600);
+	    		console.log("Saving canvas data from ", window.__globalCanvas);
+		} else {
+		    console.warn("Missing canvas for the KA Project Exporter to save the thumbnail to. Saving blank screen instead.")
+		}
 		window.top.postMessage(thumbnailCanvas.toDataURL(), "*");
 	};
 })();
