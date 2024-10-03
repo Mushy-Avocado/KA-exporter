@@ -347,8 +347,8 @@ SOFTWARE.
 		};
 		// Update mouse coordinates
 		window.addEventListener("mousemove", function(e) {
-			processing.mouseX = round(processing.canvasX(e.clientX));
-			processing.mouseY = round(processing.canvasY(e.clientY));
+			processing.mouseX = processing.round(processing.canvasX(e.clientX));
+			processing.mouseY = processing.round(processing.canvasY(e.clientY));
 		});
 		// Scales an axis based on the size of the canvas
 		// Takes a screen position as input
