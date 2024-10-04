@@ -939,6 +939,8 @@ SOFTWARE.
 		script.type = "text/javascript";
 		document.body.appendChild(script);
 	};
+	// Credit to Bluebird for their thumbnail script
+	// https://www.khanacademy.org/computer-programming/spin-off-of-the-thumbnail-script-20/4798504312684544
 	window.parent.html2canvas = function() {
 		let thumbnailCanvas = document.createElement("canvas");
 		let context = thumbnailCanvas.getContext("2d");
